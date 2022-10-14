@@ -17,6 +17,9 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+**/front-end/node_modules/**
+**/front-end/static/**
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
