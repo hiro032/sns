@@ -1,6 +1,6 @@
 package com.hiro.sns.fixture;
 
-import com.hiro.sns.model.UserEntity;
+import com.hiro.sns.model.entity.UserEntity;
 
 public class UserEntityFixture {
 

@@ -2,7 +2,7 @@ package com.hiro.sns.service;
 
 import com.hiro.sns.exception.SnsApplicationException;
 import com.hiro.sns.fixture.UserEntityFixture;
-import com.hiro.sns.model.UserEntity;
+import com.hiro.sns.model.entity.UserEntity;
 import com.hiro.sns.repository.UserEntityRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

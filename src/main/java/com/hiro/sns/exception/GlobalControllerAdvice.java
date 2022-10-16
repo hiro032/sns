@@ -1,0 +1,19 @@
+package com.hiro.sns.exception;
+
+import com.hiro.sns.controller.response.Response;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@Slf4j
+@RestControllerAdvice
+public class GlobalControllerAdvice {
+
+    @ExceptionHandler(SnsApplicationException.class)
+    public ResponseEntity<?> applicationHandler(SnsApplicationException e) {
+        log.error("Error code: {}", e.toString());
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+                .body(Response.error(e.getErrorCode().name()));
+    }
+}

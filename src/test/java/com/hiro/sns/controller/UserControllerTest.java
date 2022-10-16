@@ -3,6 +3,7 @@ package com.hiro.sns.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hiro.sns.controller.request.UserJoinRequest;
 import com.hiro.sns.controller.request.UserLoginRequest;
+import com.hiro.sns.exception.ErrorCode;
 import com.hiro.sns.exception.SnsApplicationException;
 import com.hiro.sns.model.User;
 import com.hiro.sns.service.UserService;
@@ -58,7 +59,7 @@ class UserControllerTest {
         String password = "password";
 
         when(userService.join("", ""))
-                .thenThrow(new SnsApplicationException());
+                .thenThrow(new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, ""));
 
         mockMvc.perform(post("/api/vi/users/join")
                 .contentType(MediaType.APPLICATION_JSON)
