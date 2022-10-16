@@ -8,6 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
 
@@ -26,6 +28,9 @@ class UserServiceTest {
     @Autowired
     private UserEntityRepository userEntityRepository;
 
+    @MockBean
+    private BCryptPasswordEncoder encoder;
+
     @DisplayName("회원 가입")
     @Test
     void join() {
@@ -34,6 +39,9 @@ class UserServiceTest {
 
         when(userEntityRepository.findByUserName(userName))
                 .thenReturn(Optional.empty());
+
+        when(encoder.encode(password))
+                .thenReturn("encrypt password");
 
         when(userEntityRepository.save(any()))
                 .thenReturn(Optional.of(mock(UserEntity.class)));
@@ -95,6 +103,9 @@ class UserServiceTest {
 
         when(userEntityRepository.findByUserName(userName))
                 .thenReturn(Optional.of(mock(UserEntity.class)));
+
+        when(encoder.encode(password))
+                .thenReturn("encrypt password");
 
         when(userEntityRepository.save(any()))
                 .thenReturn(Optional.of(mock(UserEntity.class)));
