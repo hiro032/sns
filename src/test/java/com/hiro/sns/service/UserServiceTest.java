@@ -1,9 +1,11 @@
 package com.hiro.sns.service;
 
 import com.hiro.sns.exception.SnsApplicationException;
+import com.hiro.sns.fixture.TestInfoFixture;
 import com.hiro.sns.fixture.UserEntityFixture;
 import com.hiro.sns.model.entity.UserEntity;
 import com.hiro.sns.repository.UserEntityRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,7 @@ class UserServiceTest {
     @Autowired
     private UserService userService;
 
-    @Autowired
+    @MockBean
     private UserEntityRepository userEntityRepository;
 
     @MockBean
@@ -34,20 +36,18 @@ class UserServiceTest {
     @DisplayName("회원 가입")
     @Test
     void join() {
-        String userName = "userName";
-        String password = "password";
+        TestInfoFixture.TestInfo fixture = TestInfoFixture.get();
 
-        when(userEntityRepository.findByUserName(userName))
-                .thenReturn(Optional.empty());
+        when(userEntityRepository.findByUserName(fixture.getUserName()))
+            .thenReturn(Optional.empty());
 
-        when(encoder.encode(password))
-                .thenReturn("encrypt password");
+        when(encoder.encode(fixture.getPassword()))
+            .thenReturn("password_encrypt");
 
         when(userEntityRepository.save(any()))
-                .thenReturn(Optional.of(mock(UserEntity.class)));
+            .thenReturn(new UserEntity());
 
-
-        assertDoesNotThrow(() -> userService.join(userName, password));
+        assertDoesNotThrow(() -> userService.join(fixture.getUserName(), fixture.getPassword()));
     }
 
     @DisplayName("로그인 성공")

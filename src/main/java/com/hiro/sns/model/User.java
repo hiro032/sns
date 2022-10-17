@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Getter
 public class User {
 
-    private Long id;
+    private Integer id;
     private String userName;
     private String password;
     private UserRole userRole;
@@ -24,9 +24,9 @@ public class User {
                 entity.getUserName(),
                 entity.getPassword(),
                 entity.getRole(),
-                entity.getRegisterAt(),
+                entity.getRegisteredAt(),
                 entity.getUpdatedAt(),
-                entity.getDeletedAt()
+                entity.getRemovedAt()
         );
     }
 }

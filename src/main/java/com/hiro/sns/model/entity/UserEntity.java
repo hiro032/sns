@@ -14,18 +14,17 @@ import java.time.Instant;
 @Table(name = "\"user\"")
 @Getter
 @Setter
-@SQLDelete(sql = "UPDATED \"user\" SET delete_at = NOW() where id = ?")
-@Where(clause = "deleted_at is NULL")
+@SQLDelete(sql = "UPDATED \"user\" SET removed_at = NOW() where id = ?")
+@Where(clause = "removed_at is NULL")
 public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "user_name")
+    @Column(name = "user_name", unique = true)
     private String userName;
 
-    @Column(name = "password")
     private String password;
 
     @Column(name = "role")
@@ -33,17 +32,17 @@ public class UserEntity {
     private UserRole role = UserRole.USER;
 
     @Column(name = "register_at")
-    private Timestamp registerAt;
+    private Timestamp registeredAt;
 
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @Column(name = "deleted_at")
-    private Timestamp deletedAt;
+    @Column(name = "removed_at")
+    private Timestamp removedAt;
 
     @PrePersist
     void registeredAt() {
-        this.registerAt = Timestamp.from(Instant.now());
+        this.registeredAt = Timestamp.from(Instant.now());
     }
 
     @PreUpdate
