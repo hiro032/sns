@@ -1,15 +1,19 @@
 package com.hiro.sns.fixture;
 
+import com.hiro.sns.model.UserRole;
 import com.hiro.sns.model.entity.UserEntity;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 public class UserEntityFixture {
 
     public static UserEntity get(String userName, String password) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(1L);
-        userEntity.setUserName(userName);
-        userEntity.setPassword(password);
-
-        return userEntity;
+        UserEntity entity = new UserEntity();
+        entity.setId(1L);
+        entity.setUserName(userName);
+        entity.setPassword(password);
+        entity.setRole(UserRole.USER);
+        entity.setRegisteredAt(Timestamp.from(Instant.now()));
+        return entity;
     }
 }
