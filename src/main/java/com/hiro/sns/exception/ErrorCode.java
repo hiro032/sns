@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     DUPLICATED_USER_NAME(HttpStatus.CONFLICT, "user name is duplicated"),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error"),
+    WRONG_PASSWORD(HttpStatus.CONFLICT, "user password is wrong");
 
     private HttpStatus httpStatus;
     private String message;

@@ -56,13 +56,11 @@ class UserServiceTest {
         String userName = "userName";
         String password = "password";
 
-        UserEntity fixture = UserEntityFixture.get(userName, password);
-
         when(userEntityRepository.findByUserName(userName))
-                .thenReturn(Optional.of(fixture));
+                .thenReturn(Optional.of(UserEntityFixture.get(userName, password)));
 
-        when(userEntityRepository.save(any()))
-                .thenReturn(Optional.of(fixture));
+        when(encoder.matches(any(), any()))
+            .thenReturn(true);
 
         assertDoesNotThrow(() -> userService.login(userName, password));
     }
