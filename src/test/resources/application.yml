@@ -1,6 +1,7 @@
 spring:
   jpa:
     hibernate:
+    format_sql: true
       ddl-auto: update
     show-sql: true
     database: h2
@@ -10,3 +11,6 @@ spring:
     url: jdbc:h2:mem:test;
     username: sa
     password:
+
+jwt:
+  secret-key: hiro.sns_2022_secret_key

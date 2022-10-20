@@ -2,6 +2,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    format_sql: true
     show-sql: true
     database: postgresql
 
@@ -13,3 +14,8 @@ spring:
     password: 4b4829e145d337b24473b40bf72ddba414471d0ef6208744b455215868aa216a
     hikari:
       maximum-pool-size: 4
+
+jwt:
+  secret-key: hiro_custom_secret_key_hiro_custom_secret_key
+  token:
+    expired-time-ms: 2592000000
