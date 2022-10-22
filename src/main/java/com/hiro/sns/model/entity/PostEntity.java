@@ -25,7 +25,7 @@ public class PostEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Integer id;
 
 	@Column(name = "title")
 	private String title;
@@ -43,8 +43,8 @@ public class PostEntity {
 	@Column(name = "updated_at")
 	private Timestamp updatedAt;
 
-	@Column(name = "removed_at")
-	private Timestamp removedAt;
+	@Column(name = "deleted_at")
+	private Timestamp deletedAt;
 
 	@PrePersist
 	void registeredAt() {
@@ -56,4 +56,11 @@ public class PostEntity {
 		this.updatedAt = Timestamp.from(Instant.now());
 	}
 
+	public static PostEntity of(String title, String body, UserEntity userEntity) {
+		PostEntity postEntity = new PostEntity();
+		postEntity.setTitle(title);
+		postEntity.setBody(body);
+		postEntity.setUser(userEntity);
+		return postEntity;
+	}
 }

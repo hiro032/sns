@@ -3,6 +3,7 @@ package com.hiro.sns.service;
 import com.hiro.sns.exception.ErrorCode;
 import com.hiro.sns.exception.SnsApplicationException;
 import com.hiro.sns.model.entity.PostEntity;
+import com.hiro.sns.model.entity.UserEntity;
 import com.hiro.sns.repository.PostEntityRepository;
 import com.hiro.sns.repository.UserEntityRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,11 @@ public class PostService {
 
 	@Transactional
 	public void create(String title, String body, String userName) {
-		userEntityRepository.findByUserName(userName)
+		final UserEntity userEntity = userEntityRepository.findByUserName(userName)
 			.orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
 
-		postEntityRepository.save(new PostEntity());
+		final PostEntity saved = postEntityRepository.save(PostEntity.of(title, body, userEntity));
+
+		return;
 	}
 }
