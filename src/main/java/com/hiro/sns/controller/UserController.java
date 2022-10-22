@@ -1,8 +1,10 @@
 package com.hiro.sns.controller;
 
 import com.hiro.sns.controller.request.UserJoinRequest;
+import com.hiro.sns.controller.request.UserLoginRequest;
 import com.hiro.sns.controller.response.Response;
 import com.hiro.sns.controller.response.UserJoinResponse;
+import com.hiro.sns.controller.response.UserLoginResponse;
 import com.hiro.sns.model.User;
 import com.hiro.sns.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +25,11 @@ public class UserController {
         User user = userService.join(request.getUserName(), request.getPassword());
 
         return Response.success(UserJoinResponse.fromUser(user));
+    }
+
+    @PostMapping("/login")
+    public Response<UserLoginResponse> login(@RequestBody UserLoginRequest request) {
+        final String token = userService.login(request.getUserName(), request.getPassword());
+        return Response.success(new UserLoginResponse(token));
     }
 }

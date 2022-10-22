@@ -7,7 +7,10 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtTokenUtils {
 
 	public static String getUserName(String token, String key) {
@@ -25,7 +28,7 @@ public class JwtTokenUtils {
 		return Jwts.parserBuilder()
 			.setSigningKey(getKey(key))
 			.build()
-			.parseClaimsJwt(token)
+			.parseClaimsJws(token)
 			.getBody();
 	}
 

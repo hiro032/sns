@@ -28,7 +28,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 		throws ServletException, IOException {
 		final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-		if (header == null || header.startsWith("Bearer ")) {
+		if (header == null || !header.startsWith("Bearer ")) {
 			log.error("Error occurs while getting header. header is null or invalid");
 			filterChain.doFilter(request, response);
 			return;
@@ -39,6 +39,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
 			if (JwtTokenUtils.isExpired(token, key)) {
 				log.error("key is expired");
+				filterChain.doFilter(request, response);
 				return;
 			}
 
