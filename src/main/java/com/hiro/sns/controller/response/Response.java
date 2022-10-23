@@ -14,6 +14,10 @@ public class Response<T> {
         return new Response<>(errorCode, null);
     }
 
+	public static <T> Response<T> success() {
+		return new Response<T>("success", null);
+	}
+
     public static <T> Response success(T result) {
         return new Response<>("success", result);
     }

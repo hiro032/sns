@@ -8,6 +8,7 @@ import com.hiro.sns.model.Post;
 import com.hiro.sns.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -34,5 +35,12 @@ public class PostController {
 		Post post = postService.modify(request.getTitle(), request.getBody(), authentication.getName(), postId);
 
 		return Response.success(PostResponse.fromPost(post));
+	}
+
+	@DeleteMapping("/{postId}")
+	public Response<Void> delete(@PathVariable Integer postId, @RequestBody PostModifyRequest request, Authentication authentication) {
+		postService.delete(request.getTitle(), request.getBody(), authentication.getName(), postId);
+
+		return Response.success();
 	}
 }
