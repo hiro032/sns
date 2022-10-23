@@ -3,8 +3,10 @@ package com.hiro.sns.service;
 import com.hiro.sns.exception.ErrorCode;
 import com.hiro.sns.exception.SnsApplicationException;
 import com.hiro.sns.model.Post;
+import com.hiro.sns.model.entity.LikeEntity;
 import com.hiro.sns.model.entity.PostEntity;
 import com.hiro.sns.model.entity.UserEntity;
+import com.hiro.sns.repository.LikeEntityRepository;
 import com.hiro.sns.repository.PostEntityRepository;
 import com.hiro.sns.repository.UserEntityRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class PostService {
 
 	private final PostEntityRepository postEntityRepository;
 	private final UserEntityRepository userEntityRepository;
+	private final LikeEntityRepository likeEntityRepository;
 
 	@Transactional
 	public Post create(String title, String body, String userName) {
@@ -74,4 +77,27 @@ public class PostService {
 
 		return postEntityRepository.findAllByUser(userEntity, pageable);
 	}
+
+	public void like(Integer postId, String userName) {
+		final UserEntity userEntity = userEntityRepository.findByUserName(userName)
+			.orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
+
+		final PostEntity postEntity = postEntityRepository.findById(postId)
+			.orElseThrow(() -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%d not found", postId)));
+
+		likeEntityRepository.findByUserAndPost(userEntity, postEntity)
+			.ifPresent(it -> {
+				throw new SnsApplicationException(ErrorCode.ALREADY_LIKED, String.format("username %s already like post %d", userName, postEntity.getId()));
+			});
+
+		likeEntityRepository.save(LikeEntity.of(userEntity, postEntity));
+	}
+
+	public int likeCount(Integer postId) {
+		PostEntity postEntity = postEntityRepository.findById(postId)
+			.orElseThrow(() -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%d not found", postId)));
+
+		return likeEntityRepository.countByPost(postEntity);
+	}
+
 }
