@@ -2,6 +2,7 @@ package com.hiro.sns.service;
 
 import com.hiro.sns.exception.ErrorCode;
 import com.hiro.sns.exception.SnsApplicationException;
+import com.hiro.sns.model.Post;
 import com.hiro.sns.model.entity.PostEntity;
 import com.hiro.sns.model.entity.UserEntity;
 import com.hiro.sns.repository.PostEntityRepository;
@@ -18,12 +19,30 @@ public class PostService {
 	private final UserEntityRepository userEntityRepository;
 
 	@Transactional
-	public void create(String title, String body, String userName) {
+	public Post create(String title, String body, String userName) {
 		final UserEntity userEntity = userEntityRepository.findByUserName(userName)
 			.orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
 
 		final PostEntity saved = postEntityRepository.save(PostEntity.of(title, body, userEntity));
 
-		return;
+		return Post.fromEntity(saved);
+	}
+
+	@Transactional
+	public Post modify(String title, String body, String userName, final Integer postId) {
+		final UserEntity userEntity = userEntityRepository.findByUserName(userName)
+			.orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
+
+		final PostEntity postEntity = postEntityRepository.findById(postId)
+			.orElseThrow(() -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not found", userName)));
+
+		if (postEntity.getUser() != userEntity) {
+			throw new SnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission", userName));
+		}
+
+		postEntity.setTitle(title);
+		postEntity.setBody(body);
+
+		return Post.fromEntity(postEntityRepository.saveAndFlush(postEntity));
 	}
 }
