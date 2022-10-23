@@ -7,8 +7,11 @@ import com.hiro.sns.controller.response.Response;
 import com.hiro.sns.model.Post;
 import com.hiro.sns.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,5 +45,19 @@ public class PostController {
 		postService.delete(request.getTitle(), request.getBody(), authentication.getName(), postId);
 
 		return Response.success();
+	}
+
+	@GetMapping
+	public Response<Page<PostResponse>> list(Pageable pageable) {
+		Page<Post> list = postService.list(pageable);
+
+		return Response.success(list);
+	}
+
+	@GetMapping("/my")
+	public Response<Page<PostResponse>> my(Pageable pageable, Authentication authentication) {
+		Page<Post> list = postService.my(authentication.getName(), pageable);
+
+		return Response.success(list);
 	}
 }
