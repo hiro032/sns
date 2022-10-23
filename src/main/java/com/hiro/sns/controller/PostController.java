@@ -1,10 +1,12 @@
 package com.hiro.sns.controller;
 
+import com.hiro.sns.controller.request.PostCommentRequest;
 import com.hiro.sns.controller.request.PostCreateRequest;
 import com.hiro.sns.controller.request.PostModifyRequest;
 import com.hiro.sns.controller.response.PostResponse;
 import com.hiro.sns.controller.response.Response;
 import com.hiro.sns.model.Post;
+import com.hiro.sns.model.entity.CommentEntity;
 import com.hiro.sns.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -71,5 +73,19 @@ public class PostController {
 	@GetMapping("/{postId}/count")
 	public Response<Integer> count(@PathVariable Integer postId) {
 		return Response.success(postService.likeCount(postId));
+	}
+
+	@PostMapping("/{postId}/comments")
+	public Response comment(@PathVariable Integer postId, @RequestBody PostCommentRequest request, Authentication authentication) {
+		postService.comment(postId, authentication.getName(), request.getComment());
+
+		return Response.success();
+	}
+
+	@GetMapping("/{postId}/comments")
+	public Response comment(@PathVariable Integer postId, Pageable pageable) {
+		Page<CommentEntity> comments = postService.getComments(postId, pageable);
+
+		return Response.success(comments);
 	}
 }

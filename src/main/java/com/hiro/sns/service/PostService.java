@@ -3,13 +3,16 @@ package com.hiro.sns.service;
 import com.hiro.sns.exception.ErrorCode;
 import com.hiro.sns.exception.SnsApplicationException;
 import com.hiro.sns.model.Post;
+import com.hiro.sns.model.entity.CommentEntity;
 import com.hiro.sns.model.entity.LikeEntity;
 import com.hiro.sns.model.entity.PostEntity;
 import com.hiro.sns.model.entity.UserEntity;
+import com.hiro.sns.repository.CommentEntityRepository;
 import com.hiro.sns.repository.LikeEntityRepository;
 import com.hiro.sns.repository.PostEntityRepository;
 import com.hiro.sns.repository.UserEntityRepository;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.asm.Advice.AssignReturned.ToReturned;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,24 +25,22 @@ public class PostService {
 	private final PostEntityRepository postEntityRepository;
 	private final UserEntityRepository userEntityRepository;
 	private final LikeEntityRepository likeEntityRepository;
+	private final CommentEntityRepository commentEntityRepository;
 
 	@Transactional
 	public Post create(String title, String body, String userName) {
-		final UserEntity userEntity = userEntityRepository.findByUserName(userName)
-			.orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
+		UserEntity userEntity = getUserOrException(userName);
 
-		final PostEntity saved = postEntityRepository.save(PostEntity.of(title, body, userEntity));
+		PostEntity saved = postEntityRepository.save(PostEntity.of(title, body, userEntity));
 
 		return Post.fromEntity(saved);
 	}
 
 	@Transactional
 	public Post modify(String title, String body, String userName, Integer postId) {
-		final UserEntity userEntity = userEntityRepository.findByUserName(userName)
-			.orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
+		UserEntity userEntity = getUserOrException(userName);
 
-		final PostEntity postEntity = postEntityRepository.findById(postId)
-			.orElseThrow(() -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not found", userName)));
+		PostEntity postEntity = getPostOrException(postId);
 
 		if (postEntity.getUser() != userEntity) {
 			throw new SnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission", userName));
@@ -53,11 +54,8 @@ public class PostService {
 
 	@Transactional
 	public void delete(String title, String body, String userName, Integer postId) {
-		final UserEntity userEntity = userEntityRepository.findByUserName(userName)
-			.orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
-
-		final PostEntity postEntity = postEntityRepository.findById(postId)
-			.orElseThrow(() -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not found", userName)));
+		UserEntity userEntity = getUserOrException(userName);
+		PostEntity postEntity = getPostOrException(postId);
 
 		if (postEntity.getUser() != userEntity) {
 			throw new SnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission", userName));
@@ -72,18 +70,14 @@ public class PostService {
 	}
 
 	public Page<Post> my(String userName, Pageable pageable) {
-		final UserEntity userEntity = userEntityRepository.findByUserName(userName)
-			.orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
+		UserEntity userEntity = getUserOrException(userName);
 
 		return postEntityRepository.findAllByUser(userEntity, pageable);
 	}
 
 	public void like(Integer postId, String userName) {
-		final UserEntity userEntity = userEntityRepository.findByUserName(userName)
-			.orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
-
-		final PostEntity postEntity = postEntityRepository.findById(postId)
-			.orElseThrow(() -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%d not found", postId)));
+		UserEntity userEntity = getUserOrException(userName);
+		PostEntity postEntity = getPostOrException(postId);
 
 		likeEntityRepository.findByUserAndPost(userEntity, postEntity)
 			.ifPresent(it -> {
@@ -94,10 +88,33 @@ public class PostService {
 	}
 
 	public int likeCount(Integer postId) {
-		PostEntity postEntity = postEntityRepository.findById(postId)
-			.orElseThrow(() -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%d not found", postId)));
+		PostEntity postEntity = getPostOrException(postId);
 
 		return likeEntityRepository.countByPost(postEntity);
+	}
+
+	@ToReturned
+	public void comment(Integer postId, String userName, String comment) {
+		UserEntity userEntity = getUserOrException(userName);
+		PostEntity postEntity = getPostOrException(postId);
+
+		commentEntityRepository.save(CommentEntity.of(userEntity, postEntity, comment));
+	}
+
+	public Page<CommentEntity> getComments(Integer postId, Pageable pageable) {
+		PostEntity postEntity = getPostOrException(postId);
+
+		return commentEntityRepository.findAllByPost(postEntity, pageable);
+	}
+
+	private PostEntity getPostOrException(Integer postId) {
+		return postEntityRepository.findById(postId)
+			.orElseThrow(() -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%d not found", postId)));
+	}
+
+	private UserEntity getUserOrException(String userName) {
+		return userEntityRepository.findByUserName(userName)
+			.orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
 	}
 
 }
