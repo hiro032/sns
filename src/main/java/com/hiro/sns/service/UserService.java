@@ -62,7 +62,7 @@ public class UserService {
         UserEntity userEntity = userRepository.findByUserName(userName)
             .orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
 
-        return  alarmRepository.findAllByUser(userEntity)
+        return  alarmRepository.findAllByUserId(userEntity.getId(), pageable)
             .map(Alarm::fromEntity);
     }
 }
