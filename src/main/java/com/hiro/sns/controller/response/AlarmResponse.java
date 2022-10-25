@@ -5,9 +5,9 @@ import com.hiro.sns.model.AlarmArgs;
 import com.hiro.sns.model.AlarmType;
 import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 @AllArgsConstructor
 public class AlarmResponse {
 	private Integer id;

@@ -2,11 +2,15 @@ package com.hiro.sns.service;
 
 import com.hiro.sns.exception.ErrorCode;
 import com.hiro.sns.exception.SnsApplicationException;
+import com.hiro.sns.model.AlarmArgs;
+import com.hiro.sns.model.AlarmType;
 import com.hiro.sns.model.Post;
+import com.hiro.sns.model.entity.AlarmEntity;
 import com.hiro.sns.model.entity.CommentEntity;
 import com.hiro.sns.model.entity.LikeEntity;
 import com.hiro.sns.model.entity.PostEntity;
 import com.hiro.sns.model.entity.UserEntity;
+import com.hiro.sns.repository.AlarmEntityRepository;
 import com.hiro.sns.repository.CommentEntityRepository;
 import com.hiro.sns.repository.LikeEntityRepository;
 import com.hiro.sns.repository.PostEntityRepository;
@@ -26,6 +30,7 @@ public class PostService {
 	private final UserEntityRepository userEntityRepository;
 	private final LikeEntityRepository likeEntityRepository;
 	private final CommentEntityRepository commentEntityRepository;
+	private final AlarmEntityRepository alarmEntityRepository;
 
 	@Transactional
 	public Post create(String title, String body, String userName) {
@@ -85,6 +90,8 @@ public class PostService {
 			});
 
 		likeEntityRepository.save(LikeEntity.of(userEntity, postEntity));
+
+		alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId())));
 	}
 
 	public int likeCount(Integer postId) {
@@ -99,6 +106,8 @@ public class PostService {
 		PostEntity postEntity = getPostOrException(postId);
 
 		commentEntityRepository.save(CommentEntity.of(userEntity, postEntity, comment));
+
+		alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_CONTENT_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId())));
 	}
 
 	public Page<CommentEntity> getComments(Integer postId, Pageable pageable) {
